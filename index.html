@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Page</title>
+    <script src="https://player.vimeo.com/api/player.js"></script>
+</head>
+<body>
+    <!-- User Information Form -->
+    <form id="user-info-form">
+        <input type="email" id="user-email" placeholder="Email" required>
+        <input type="text" id="user-name" placeholder="Name" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <!-- Vimeo video embed -->
+    <iframe id="vimeo-video" src="https://player.vimeo.com/video/982815778" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+
+    <script>
+        document.getElementById('user-info-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var email = document.getElementById('user-email').value;
+            var name = document.getElementById('user-name').value;
+
+            var iframe = document.getElementById('vimeo-video');
+            var player = new Vimeo.Player(iframe);
+
+            player.on('play', function() {
+                var userInfo = {
+                    email: email,
+                    name: name
+                };
+
+                fetch('http://127.0.0.1:5000/track-click', { // Use your local Flask server URL
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        video_id: '982815778',
+                        user_info: userInfo
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
